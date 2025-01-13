@@ -1,0 +1,53 @@
+# The main job for dbx_dab_demo.
+resources:
+  jobs:
+    dbx_dab_demo_job:
+      name: dbx_dab_demo_job
+
+      schedule:
+        # Run this job every day, exactly one day from the last run; see https://docs.databricks.com/api/workspace/jobs/create#trigger
+        pause_status: UNPAUSED
+        quartz_cron_expression: "0 0 6 * * ?"
+        timezone_id: America/New_York
+
+      email_notifications:
+        on_success: 
+          - ganesh.chandra@databricks.com
+        on_failure:
+          - ganesh.chandra@databricks.com
+
+      tasks:
+        - task_key: us_states_task
+          # libraries:
+          #   - pypi:
+          #       package: "dbfs:/Volume/faker-8.1.0-py3-none-any.whl"
+          #   - pypi:
+          #       package: "dbfs:/Volume/faker-8.1.0-py3-none-any.whl"
+
+          job_cluster_key: job_cluster
+          spark_python_task:
+            python_file: ../src/us_states.py
+
+        - task_key: patient_info_task
+          job_cluster_key: job_cluster
+          spark_python_task:
+            python_file: ../src/patientinfo.py
+
+        - task_key: weather_task
+          job_cluster_key: job_cluster
+          spark_python_task:
+            python_file: ../src/weather.py
+          depends_on: 
+            - task_key: us_states_task
+            - task_key: patient_info_task
+        
+      job_clusters:
+        - job_cluster_key: job_cluster
+          new_cluster:
+            spark_version: 16.0.x-scala2.12
+            node_type_id: Standard_D3_v2
+            data_security_mode: SINGLE_USER #UC ENABLED CLUSTER
+            autoscale:
+                min_workers: 1
+                max_workers: 4
+          
