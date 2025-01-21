@@ -20,7 +20,7 @@ def spark_session():
         exit(1)
     
 def test_row_count(spark_session):
-    df = load_weatherinfo(spark_session)
+    df = load_patientinfo(spark_session)
     assert df.count() >= 5
 
 # def test_second_row(spark_session):

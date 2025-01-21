@@ -17,37 +17,57 @@ resources:
           - ganesh.chandra@databricks.com
 
       tasks:
-        - task_key: us_states_task
-          # libraries:
-          #   - pypi:
-          #       package: "dbfs:/Volume/faker-8.1.0-py3-none-any.whl"
-          #   - pypi:
-          #       package: "dbfs:/Volume/faker-8.1.0-py3-none-any.whl"
+        # - task_key: us_states_task
+        #   # libraries:
+        #   #   - pypi:
+        #   #       package: "dbfs:/Volume/faker-8.1.0-py3-none-any.whl"
+        #   #   - pypi:
+        #   #       package: "dbfs:/Volume/faker-8.1.0-py3-none-any.whl"
 
-          job_cluster_key: job_cluster
-          spark_python_task:
-            python_file: ../src/us_states.py
+        #   # job_cluster_key: job_cluster
+        #   spark_python_task:
+        #     python_file: ../src/us_states.py
 
         - task_key: patient_info_task
-          job_cluster_key: job_cluster
+          # job_cluster_key: job_cluster
+          environment_key: default
+          
           spark_python_task:
             python_file: ../src/patientinfo.py
+            parameters:
+              - "{{job.parameters.gcparam1}}"
+              - "{{job.parameters.gcparam2}}"
+            
+        # - task_key: weather_task
+        #   # job_cluster_key: job_cluster
+        #   spark_python_task:
+        #     python_file: ../src/weather.py
+        #   depends_on: 
+        #     - task_key: us_states_task
+        #     - task_key: patient_info_task
 
-        - task_key: weather_task
-          job_cluster_key: job_cluster
-          spark_python_task:
-            python_file: ../src/weather.py
-          depends_on: 
-            - task_key: us_states_task
-            - task_key: patient_info_task
-        
-      job_clusters:
-        - job_cluster_key: job_cluster
-          new_cluster:
-            spark_version: 16.0.x-scala2.12
-            node_type_id: Standard_D3_v2
-            data_security_mode: SINGLE_USER #UC ENABLED CLUSTER
-            autoscale:
-                min_workers: 1
-                max_workers: 4
+      environments: 
+        - environment_key: default
+          spec: 
+            client: "1"
+
+      parameters:
+        - name: gcparam1
+          default: "default_value1"
+        - name: gcparam2
+          default: "default_value2"
+      
+      # job_clusters:
+      #   - job_cluster_key: job_cluster
+      #     new_cluster:
+      #       spark_version: 16.0.x-scala2.12
+      #       node_type_id: Standard_D3_v2
+      #       data_security_mode: SINGLE_USER #UC ENABLED CLUSTER
+      #       autoscale:
+      #           min_workers: 1
+      #           max_workers: 4
+
+      permissions: 
+        - level: CAN_MANAGE
+          group_name: AAD DC Administrators
           

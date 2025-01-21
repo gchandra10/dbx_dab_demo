@@ -1,9 +1,8 @@
 import pytest
 from databricks.connect import DatabricksSession
-from pyspark.testing.utils import assertDataFrameEqual, assertSchemaEqual 
+from pyspark.testing.utils import assertSchemaEqual 
 from pyspark.sql.types import StructType, StructField, StringType, IntegerType
-import sys
-import os
+import sys, os
 
 databricks_env_path = os.path.join(os.getcwd(), '.databricks', '.databricks.env')
 
@@ -11,7 +10,7 @@ from dotenv import load_dotenv
 load_dotenv(databricks_env_path)
 
 sys.path.append('./src')
-from common.utils import load_us_states
+from common.utils import *
 
 @pytest.fixture(scope="module")
 def spark_session():
